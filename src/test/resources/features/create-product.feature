@@ -13,7 +13,7 @@ Background:
     }
     """
 
-Scenario: Create a new product
+Scenario: Create a new product (POST)
   Given request productPayload
   When method POST
   * print response
