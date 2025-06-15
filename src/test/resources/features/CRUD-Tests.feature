@@ -1,0 +1,124 @@
+@karatetestapi
+Feature: CRUD operations on Product API
+
+Background:
+  * def createResult = callonce read('classpath:features/create-product.feature')
+  * def productId = createResult.productId
+  * def productTitle = createResult.productTitle
+  * def productPrice = createResult.productPrice
+  * def productdescription = createResult.productdescription
+  * url 'https://api.escuelajs.co/api/v1/products'
+
+##############################
+#        Positive Tests      #
+##############################
+
+@Positive_Scenario
+Scenario: Get the created product (GET)
+  Given path productId
+  When method GET
+  Then status 200
+  And match response.title == productTitle
+  And match response.price == productPrice
+  And match response.description == productdescription
+
+@Positive_Scenario
+Scenario: Update the product (PUT)
+  * def updatedPayload =
+    """
+    {
+      "title": "#(productTitle)",
+      "price": 56,
+      "description": "Updated description using Karate",
+      "categoryId": 1,
+      "images": ["https://placeimg.com/640/480/tech"]
+    }
+    """
+  Given path productId
+  And request updatedPayload
+  When method PUT
+  Then status 200
+  And match response.title == productTitle
+  And match response.price == 56
+  And match response.description == "Updated description using Karate"
+
+@Positive_Scenario
+Scenario: Delete the product (DELETE)
+  Given path productId
+  When method DELETE
+  Then status 200
+
+@Positive_Scenario
+Scenario: Verify product has been deleted (GET)
+  Given path productId
+  When method GET
+  Then status 404
+
+##############################
+#        Negative Tests      #
+##############################
+
+@Negative_Scenario
+Scenario: Get product with invalid ID
+  Given path 'invalid-id'
+  When method GET
+  Then status 400
+
+@Negative_Scenario
+Scenario: Get product with non-existent numeric ID
+  Given path 9999999
+  When method GET
+  Then status 404
+
+@Negative_Scenario
+Scenario: Create product with missing fields (POST)
+  * def invalidPayload =
+    """
+    {
+      "title": "Incomplete Product"
+      // Missing price, description, categoryId, images
+    }
+    """
+  Given request invalidPayload
+  When method POST
+  Then status 400
+
+@Negative_Scenario
+Scenario: Update product with invalid data
+  * def badPayload =
+    """
+    {
+      "title": "",
+      "price": -10,
+      "description": 12345,
+      "categoryId": "invalid",
+      "images": ["not-a-url"]
+    }
+    """
+  Given path productId
+  And request badPayload
+  When method PUT
+  Then status 400
+
+@Negative_Scenario
+Scenario: Delete product with non-existent ID
+  Given path 9999999
+  When method DELETE
+  Then status 404
+
+@Negative_Scenario
+Scenario: Update non-existent product
+  * def validPayload =
+    """
+    {
+      "title": "Non-existent Update",
+      "price": 25,
+      "description": "Trying to update a non-existent product",
+      "categoryId": 1,
+      "images": ["https://placeimg.com/640/480/tech"]
+    }
+    """
+  Given path 9999999
+  And request validPayload
+  When method PUT
+  Then status 404

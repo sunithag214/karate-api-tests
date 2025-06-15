@@ -56,3 +56,42 @@ Scenario: Verify product has been deleted (GET)
   * print response
   * print responseStatus
   Then status 400
+
+@Negative_Scenario
+Scenario: Get product with invalid ID
+  Given path 'invalid-id'
+  When method GET
+  Then status 400
+  * print response
+
+@Negative_Scenario
+Scenario: Get product with non-existent numeric ID
+  Given path 9999999
+  When method GET
+  Then status 400
+  * print response
+
+@Negative_Scenario
+Scenario: Update product with invalid data
+  * def badPayload =
+    """
+    {
+      "title": "",
+      "price": -10,
+      "description": 12345,
+      "categoryId": "invalid",
+      "images": ["not-a-url"]
+    }
+    """
+  Given path productId
+  And request badPayload
+  When method PUT
+  Then status 400
+  * print response
+
+@Negative_Scenario
+Scenario: Delete product with non-existent ID
+  Given path 9999999
+  When method DELETE
+  Then status 400
+* print response
