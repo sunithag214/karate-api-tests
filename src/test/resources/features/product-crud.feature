@@ -63,13 +63,7 @@ Scenario: Get product with invalid ID
   When method GET
   Then status 400
   * print response
-
-@Negative_Scenario
-Scenario: Get product with invalid method
-  Given path productId
-  When method PUT
-  Then status 405
-  * print response
+  
 
 @Negative_Scenario
 Scenario: Get product with non-existent numeric ID

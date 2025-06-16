@@ -5,7 +5,7 @@ Background:
   * def productPayload =
     """
     {
-      "title": "Sample Test 1",
+      "title": "Sample Test 5",
       "price": 65,
       "description": "This is a test product created using Karate",
       "categoryId": 1,
