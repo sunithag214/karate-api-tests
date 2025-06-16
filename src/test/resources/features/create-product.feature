@@ -26,3 +26,18 @@ Scenario: Create a new product (POST)
   * def productPrice = response.price
   * def productdescription = response.description
   * print productId
+
+@negative scenario
+  Scenario: Create a new product (POST) with duplicate Title
+  Given request productPayload
+  When method POST
+  * print response
+  * print responseStatus
+  Then status 201
+  And match response.title == productPayload.title
+  * print response.title
+  * def productId = response.id
+  * def productTitle = response.title
+  * def productPrice = response.price
+  * def productdescription = response.description
+  * print productId
